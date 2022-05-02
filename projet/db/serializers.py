@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Event, Contract, Customer, CustomUsers
 
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUsers
@@ -57,7 +58,6 @@ class ContractSerializer(serializers.ModelSerializer):
             'sales': {'read_only': True},
             'time_created': {'read_only': True},
         }
-
 
 
 class EventSerializer(serializers.ModelSerializer):

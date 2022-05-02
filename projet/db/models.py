@@ -26,7 +26,6 @@ roles_list = [
 ]
 
 
-
 class CustomUsers(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
     username = None
@@ -44,7 +43,7 @@ class CustomUsers(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
     list_filter = ('staff', 'admin')
     list_display = ('user_id', 'first-name', 'last_name')
-    ordering = ('user_id')
+    ordering = 'user_id'
 
     @property
     def is_staff(self):

@@ -1,17 +1,12 @@
-from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout, login, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from rest_framework.viewsets import ModelViewSet
 from django.shortcuts import get_object_or_404
 from .models import Event, Contract, Customer, CustomUsers
 from .serializers import ContractSerializer, CustomerSerializer, EventSerializer, CustomUserSerializer
-from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .permissions import hasCustomerPermission, hasEventPermission, hasContractPermission
+from .permissions import HasCustomerPermission, HasEventPermission, HasContractPermission
 
 
 class UserRegistrationView(ModelViewSet):
@@ -33,16 +28,6 @@ class UserRegistrationView(ModelViewSet):
         else:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-@login_required(login_url='db:login')
-class Main(ModelViewSet):
-    def list(self, request, *args, **kwargs):
-        message = 'Welcome to the homepage'
-        return Response({'message':message}, status=status.HTTP_200_OK)
-
 
 
 class Customers(ModelViewSet):
@@ -83,7 +68,7 @@ class Customers(ModelViewSet):
 class SoloCustomer(ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
-    permission_classes = [IsAuthenticated, hasCustomerPermission]
+    permission_classes = [IsAuthenticated, HasCustomerPermission]
 
     def retrieve(self, request, *args, **kwargs):
         instance = Customer.objects.get(id=kwargs['pk'])
@@ -104,7 +89,10 @@ class SoloCustomer(ModelViewSet):
 
 
     def destroy(self, request, *args, **kwargs):
-        message = "It is forbidden to delete customers"
+        obj = get_object_or_404(Customer, id=kwargs['customer_id'])
+        self.check_object_permissions(self.request, obj)
+        self.perform_destroy(obj)
+        message = 'You successfully deleted the Customer'
         return Response({'message': message},
                         status=status.HTTP_204_NO_CONTENT)
 
@@ -138,7 +126,7 @@ class Contracts(ModelViewSet):
 class SoloContract(ModelViewSet):
     serializer_class=ContractSerializer
     queryset = Contract.objects.all()
-    permission_classes=[IsAuthenticated, hasContractPermission]
+    permission_classes=[IsAuthenticated, HasContractPermission]
 
     def retrieve(self, request, *args, **kwargs):
         instance = Contract.objects.get(id=kwargs['contract_id'])
@@ -159,16 +147,20 @@ class SoloContract(ModelViewSet):
 
 
     def destroy(self, request, *args, ** kwargs):
-        message = 'Deleting contracts is not allowed'
+        obj = get_object_or_404(Contract, id=kwargs['contract_id'])
+        self.check_object_permissions(self.request, obj)
+        self.perform_destroy(obj)
+        message = 'You deleted the contract'
         return Response({'message': message},
                         status=status.HTTP_204_NO_CONTENT)
+
 
 
 
 class Events(ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
-    permission_classes = [IsAuthenticated, hasEventPermission]
+    permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         instances = Event.objects.all()
@@ -191,10 +183,10 @@ class Events(ModelViewSet):
 
 
 
-class SoloEvent(ModelViewSet, LoginRequiredMixin):
+class SoloEvent(ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
-    permission_classes = [IsAuthenticated, hasEventPermission]
+    permission_classes = [IsAuthenticated, HasEventPermission]
 
     def update(self, request, *args, **kwargs):
         obj = get_object_or_404(Event, id=kwargs['event_id'])
@@ -209,7 +201,10 @@ class SoloEvent(ModelViewSet, LoginRequiredMixin):
 
 
     def destroy(self, request, *args, ** kwargs):
-        message = 'It is not allowed to delete Events'
+        obj = get_object_or_404(Event, id=kwargs['event_id'])
+        self.check_object_permissions(self.request, obj)
+        self.perform_destroy(obj)
+        message = 'You deleted the event'
         return Response({'message': message},
                         status=status.HTTP_204_NO_CONTENT)
 
