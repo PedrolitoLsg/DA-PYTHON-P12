@@ -64,7 +64,7 @@ class Customer(models.Model):
     sales = models.ForeignKey(to=CustomUsers, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return self.company_name
 
 
 class Contract(models.Model):
