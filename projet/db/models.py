@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.conf import settings
-from .managers import CustomUsersManager
+from .managers import UsersManager
 from django.contrib.auth.models import PermissionsMixin
 
 support_choices = [
@@ -26,7 +26,7 @@ roles_list = [
 ]
 
 
-class CustomUsers(AbstractBaseUser, PermissionsMixin):
+class Users(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
     username = None
     email = models.EmailField(max_length=40, unique=True)
@@ -61,7 +61,7 @@ class Customer(models.Model):
                                     )
     date_creation = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
-    sales = models.ForeignKey(to=CustomUsers, on_delete=models.CASCADE)
+    sales = models.ForeignKey(to=Users, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.company_name
@@ -70,7 +70,7 @@ class Customer(models.Model):
 class Contract(models.Model):
     value = models.IntegerField()
     customer = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
-    sales = models.ForeignKey(to=CustomUsers, on_delete=models.CASCADE)
+    sales = models.ForeignKey(to=Users, on_delete=models.CASCADE)
     time_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=124,
                               choices=contract_status,
@@ -84,7 +84,7 @@ class Event(models.Model):
     contract = models.OneToOneField(Contract,
                                  on_delete=models.CASCADE)
     date = models.DateTimeField(null=True)
-    support = models.ForeignKey(to=CustomUsers, on_delete=models.CASCADE, null=True)
+    support = models.ForeignKey(to=Users, on_delete=models.CASCADE, null=True)
     status = models.CharField(max_length=50,
                               choices=event_status,
                               default='open')

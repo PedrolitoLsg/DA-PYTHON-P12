@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from django.shortcuts import get_object_or_404
 from .models import Event, Contract, Customer, CustomUsers
-from .serializers import ContractSerializer, CustomerSerializer, EventSerializer, CustomUserSerializer
+from .serializers import ContractSerializer, CustomerSerializer, EventSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import HasCustomerPermission, HasEventPermission, HasContractPermission
@@ -11,12 +11,12 @@ from .permissions import HasCustomerPermission, HasEventPermission, HasContractP
 
 class UserRegistrationView(ModelViewSet):
     permission_classes = [AllowAny]
-    queryset = CustomUsers.objects.all()
-    serializer_class = CustomUserSerializer
+    queryset = Users.objects.all()
+    serializer_class = UserSerializer
 
     '''creates a new user'''
     def create(self, request, *args, **kwargs):
-        serializer = CustomUserSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.create_user(email=request.data['email'],
                                    last_name=request.data['last_name'],

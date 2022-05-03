@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import Event, Contract, Customer, CustomUsers
+from .models import Event, Contract, Customer, Users
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUsers
+        model = Users
         fields = ['first_name', 'last_name', 'email', 'role']
         extra_kwargs = {'password': {'write_only': True},
                         'id': {'read_only': True}}
@@ -15,7 +15,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             raise ValueError('Users must have an email address')
         if not password:
             raise ValueError('Users must have a password')
-        user = CustomUsers.objects.create(
+        user = Users.objects.create(
             email=email,
             role=role
         )
